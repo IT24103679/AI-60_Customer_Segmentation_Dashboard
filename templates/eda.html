@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}EDA Insights | AI-60 Customer Segmentation Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fa-solid fa-magnifying-glass-chart" style="color: var(--primary);"></i>
+        Exploratory Data Analysis (EDA) Insights
+    </h1>
+    <p class="page-subtitle">
+        Comprehensive preliminary evaluation of the Online Retail transactional dataset (541,909 records), highlighting critical data sanitization requirements, outlier dynamics, and commercial purchasing behavior.
+    </p>
+</div>
+
+<!-- 2 Analytical Boxes: Data Quality Issues & Business Insights -->
+<section class="info-boxes-grid" aria-label="EDA Findings">
+    <!-- Box 1: Data Quality Issues -->
+    <div class="info-box warning-lens" id="data-quality-box">
+        <div class="info-box-header">
+            <div class="info-box-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h2 class="info-box-title">Data Quality Issues &amp; Preprocessing</h2>
+            </div>
+            <span class="info-box-badge" style="color: #b45309; background: #fef3c7;">Sanitization Protocol</span>
+        </div>
+        <p>
+            The raw transactional dataset presented severe data anomalies, high-volume null identifiers, and structural outliers requiring systematic data cleansing before machine learning:
+        </p>
+        <ul class="info-box-list">
+            <li>
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><strong>Missing Customer IDs:</strong> Exactly <strong>135,080 rows (~24.93%)</strong> lacked a valid <code>CustomerID</code>. Because customer segmentation requires persistent individual tracking, these rows were filtered out.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><strong>Missing Descriptions:</strong> 1,455 items (0.27%) had null product descriptions and were rectified.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><strong>Negative Quantities (Returns):</strong> Over 10,000 transaction line items recorded negative quantities representing canceled invoices (invoices prefixed with 'C') or damaged inventory reconciliations.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><strong>Duplicate Invoices:</strong> 5,268 exact duplicate rows (0.97% of total records) were detected and purged to eliminate double counting.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><strong>Extreme Outliers:</strong> Massive dispersion was observed in <code>Quantity</code> (-80,995 to +80,995) and <code>UnitPrice</code> (up to £38,970.00 for manual debts), necessitating IQR-based boundary capping.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Box 2: Business & Behavioral Insights -->
+    <div class="info-box insight-lens" id="business-insights-box">
+        <div class="info-box-header">
+            <div class="info-box-icon">
+                <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            <div>
+                <h2 class="info-box-title">Commercial &amp; Behavioral Insights</h2>
+            </div>
+            <span class="info-box-badge" style="color: #0284c7; background: #e0f2fe;">Domain Analysis</span>
+        </div>
+        <p>
+            Statistical evaluation revealed distinct purchasing patterns, temporal seasonality, and geographic concentration across the retail ecosystem:
+        </p>
+        <ul class="info-box-list">
+            <li>
+                <i class="fa-solid fa-chart-pie"></i>
+                <span><strong>Geographic Dominance:</strong> Approximately <strong>85% to 89%</strong> of all transaction volume and revenue originated from the United Kingdom, followed by Germany, France, and EIRE.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-calendar-days"></i>
+                <span><strong>Strong Q4 Seasonality:</strong> Order volume surges significantly in November and December, representing holiday gift preparation, year-end stock accumulation, and wholesale restocking.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-clock"></i>
+                <span><strong>Operational Peak Windows:</strong> Order activity is concentrated on <strong>Tuesday and Wednesday</strong>, peaking between <strong>8:00 AM and 3:00 PM GMT</strong> during standard European business hours.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-arrow-trend-up"></i>
+                <span><strong>Right-Skewed Distributions:</strong> Recency, Frequency, and Monetary metrics exhibit heavy positive skewness, where the top 10% of customers generate more than 60% of total commercial revenue.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-box-open"></i>
+                <span><strong>Catalog Diversity:</strong> High affinity observed in household gifts, decorative homeware, kitchen utensils, and party accessories.</span>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- 2 Visual Exhibits Section -->
+<section style="margin-top: 2.5rem;">
+    <h3 style="font-size: 1.35rem; color: var(--navy-dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-images" style="color: var(--primary);"></i>
+        Visual Exhibits &amp; Preprocessing Diagnostics
+    </h3>
+    <p style="color: var(--slate-500); font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Key distribution artifacts captured during the data cleaning and feature engineering pipelines.
+    </p>
+
+    <div class="exhibits-grid">
+        <!-- Exhibit 1: RFM Distributions -->
+        <div class="exhibit-card" id="exhibit-rfm">
+            <div class="exhibit-header">
+                <h4 class="exhibit-title">Exhibit 1: RFM Metric Distributions</h4>
+                <span class="exhibit-subtitle">Raw customer-level Recency, Frequency, and Monetary values</span>
+            </div>
+            <div class="exhibit-image-wrapper">
+                <img src="{{ url_for('static', filename='images/rfm_distributions.png') }}" 
+                     alt="RFM Metric Distributions" 
+                     loading="lazy"
+                     id="img-rfm-dist">
+            </div>
+            <div class="exhibit-footer">
+                <p>
+                    <strong>Observations:</strong> Demonstrates the extreme right-tail skewness inherent in e-commerce transactions. Without non-linear transformation or feature scaling, high-expenditure customers would overshadow Recency and Frequency dimensions in distance-based clustering algorithms.
+                </p>
+            </div>
+        </div>
+
+        <!-- Exhibit 2: Feature Scaling Comparison -->
+        <div class="exhibit-card" id="exhibit-scaling">
+            <div class="exhibit-header">
+                <h4 class="exhibit-title">Exhibit 2: Feature Scaling Comparison</h4>
+                <span class="exhibit-subtitle">Pre vs. Post StandardScaler Normalization across RFM dimensions</span>
+            </div>
+            <div class="exhibit-image-wrapper">
+                <img src="{{ url_for('static', filename='images/feature_scaling_comparison.png') }}" 
+                     alt="Feature Scaling Comparison" 
+                     loading="lazy"
+                     id="img-scaling-comp">
+            </div>
+            <div class="exhibit-footer">
+                <p>
+                    <strong>Observations:</strong> Standardizing features to mean $\mu=0$ and standard deviation $\sigma=1$ ensures that Euclidean distance metrics treat Recency, Frequency, and Monetary values with balanced mathematical weighting during K-Means and Hierarchical partitioning.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

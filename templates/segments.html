@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Segments | AI-60 Customer Segmentation Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fa-solid fa-users-viewfinder" style="color: var(--primary);"></i>
+        Customer Segmentation Analysis
+    </h1>
+    <p class="page-subtitle">
+        Behavioral segmentation produced by the champion K-Means ($k=4$) algorithm, categorizing 3,614 active retail customers across Recency, Frequency, and Monetary spending patterns.
+    </p>
+</div>
+
+<!-- Interactive Charts Grid: Bar Chart & Pie Chart -->
+<section class="charts-grid" aria-label="Segment Visualizations">
+    <!-- Chart 1: Distribution Bar Chart -->
+    <div class="chart-card" id="chart-card-bar">
+        <div class="chart-header">
+            <h3 class="chart-title">
+                <i class="fa-solid fa-chart-column" style="color: var(--primary); margin-right: 0.4rem;"></i>
+                Customer Count by Cluster
+            </h3>
+            <span class="badge badge-blue">K-Means ($k=4$)</span>
+        </div>
+        <div class="chart-canvas-wrapper">
+            <canvas id="segmentBarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: Proportion Doughnut/Pie Chart -->
+    <div class="chart-card" id="chart-card-pie">
+        <div class="chart-header">
+            <h3 class="chart-title">
+                <i class="fa-solid fa-chart-pie" style="color: #0284c7; margin-right: 0.4rem;"></i>
+                Segment Population Share
+            </h3>
+            <span class="badge badge-secondary">Aggregated Cohorts</span>
+        </div>
+        <div class="chart-canvas-wrapper">
+            <canvas id="segmentPieChart"></canvas>
+        </div>
+    </div>
+</section>
+
+<!-- Segment Profiles Table -->
+<section style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h3 style="font-size: 1.35rem; color: var(--navy-dark); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-table-list" style="color: var(--primary);"></i>
+                Cluster Statistical Profiles (RFM Summary)
+            </h3>
+            <p style="color: var(--slate-500); font-size: 0.9rem;">
+                Exact mean and median metrics extracted from <code>data/segment_profiles.csv</code>.
+            </p>
+        </div>
+        <span class="badge badge-champion">3,614 Customers Evaluated</span>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table" id="segmentProfilesTable">
+            <thead>
+                <tr>
+                    <th>Cluster ID</th>
+                    <th>Segment Label</th>
+                    <th>Customer Count</th>
+                    <th>Recency (Days)<br><small style="color: var(--slate-400); font-weight: normal;">Mean / Median</small></th>
+                    <th>Frequency (Orders)<br><small style="color: var(--slate-400); font-weight: normal;">Mean / Median</small></th>
+                    <th>Monetary Spend ($)<br><small style="color: var(--slate-400); font-weight: normal;">Mean / Median</small></th>
+                    <th>Strategic Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in profiles %}
+                <tr>
+                    <td><span class="metric-pill">#{{ p.cluster_id }}</span></td>
+                    <td>
+                        <strong style="color: var(--navy-dark);">{{ p.label }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: {{ p.color }}18; color: {{ p.color }};">
+                            <i class="fa-solid fa-user"></i> {{ "{:,}".format(p.count) }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>{{ p.recency_mean }}d</strong> / <span style="color: var(--slate-500);">{{ p.recency_median }}d</span>
+                    </td>
+                    <td>
+                        <strong>{{ p.frequency_mean }}</strong> / <span style="color: var(--slate-500);">{{ p.frequency_median }}</span>
+                    </td>
+                    <td>
+                        <strong style="color: #059669;">${{ "{:,.2f}".format(p.monetary_mean) }}</strong> / <span style="color: var(--slate-500);">${{ "{:,.2f}".format(p.monetary_median) }}</span>
+                    </td>
+                    <td>
+                        <span class="badge {{ 'badge-champion' if p.cluster_id == 3 else ('badge-blue' if p.cluster_id == 0 else ('badge-amber' if p.cluster_id == 2 else 'badge-rose')) }}">
+                            {{ p.badge }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Expandable Segment Details & Strategic Playbooks -->
+<section style="margin-bottom: 2.5rem;">
+    <h3 style="font-size: 1.35rem; color: var(--navy-dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-folder-tree" style="color: var(--primary);"></i>
+        Expandable Segment Details &amp; Business Action Plans
+    </h3>
+    <p style="color: var(--slate-500); font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Click any customer persona below to reveal full behavioral characteristics, transaction cadences, and recommended marketing interventions.
+    </p>
+
+    <div class="accordion-wrapper" id="segmentsAccordion">
+        {% for item in narratives %}
+        <div class="accordion-item {% if loop.first %}active{% endif %}" id="persona-item-{{ item.id }}">
+            <div class="accordion-header">
+                <div class="accordion-title-group">
+                    <div class="accordion-icon theme-{{ item.color_theme }}">
+                        <i class="fa-solid {{ item.icon }}"></i>
+                    </div>
+                    <div>
+                        <h4 class="accordion-title">{{ item.title }}</h4>
+                        <span class="accordion-subtitle">{{ item.subtitle }}</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="badge badge-secondary">{{ item.tag }}</span>
+                    <i class="fa-solid fa-chevron-down accordion-toggle-icon"></i>
+                </div>
+            </div>
+
+            <div class="accordion-content">
+                <div class="persona-details-grid">
+                    <div class="persona-box">
+                        <div class="persona-box-title">
+                            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i>
+                            RFM Trajectory
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.35rem;"><strong>Recency:</strong> {{ item.recency_desc }}</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.35rem;"><strong>Frequency:</strong> {{ item.frequency_desc }}</p>
+                        <p style="font-size: 0.9rem;"><strong>Monetary:</strong> {{ item.monetary_desc }}</p>
+                    </div>
+
+                    <div class="persona-box">
+                        <div class="persona-box-title">
+                            <i class="fa-solid fa-brain" style="color: #0284c7;"></i>
+                            Behavioral Dynamic
+                        </div>
+                        <p style="font-size: 0.92rem; color: var(--navy-medium);">{{ item.behavior }}</p>
+                    </div>
+                </div>
+
+                <div class="persona-box" style="background: #ffffff; border-left: 4px solid var(--primary);">
+                    <div class="persona-box-title" style="color: var(--primary);">
+                        <i class="fa-solid fa-bullseye"></i>
+                        Strategic Marketing Recommendations
+                    </div>
+                    <ul class="info-box-list" style="margin-top: 0.25rem;">
+                        {% for strat in item.strategies %}
+                        <li>
+                            <i class="fa-solid fa-circle-check" style="color: var(--primary);"></i>
+                            <span>{{ strat }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Visual Exhibit: Segment Profiles Plot -->
+<section style="margin-top: 2rem;">
+    <div class="exhibit-card" id="exhibit-segment-profiles">
+        <div class="exhibit-header">
+            <h4 class="exhibit-title">Cluster Centroid Profile Analysis</h4>
+            <span class="exhibit-subtitle">Comparative visualization of standardized RFM metrics across the 4 clusters</span>
+        </div>
+        <div class="exhibit-image-wrapper">
+            <img src="{{ url_for('static', filename='images/segment_profiles.png') }}" 
+                 alt="Segment Profiles Multi-metric Plot" 
+                 loading="lazy"
+                 id="img-segment-profiles">
+        </div>
+        <div class="exhibit-footer">
+            <p>
+                <strong>Interpretation:</strong> Notice the distinct separation among groups: Cluster 1 is heavily shifted along the positive Recency axis (high dormancy), Cluster 2 clusters around low frequency with recent orders, while Cluster 0 and 3 lead in order repeat velocity and aggregate monetary contribution.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

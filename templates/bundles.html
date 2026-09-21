@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Bundles | AI-60 Customer Segmentation Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i>
+        Product Bundle Recommendations
+    </h1>
+    <p class="page-subtitle">
+        Market Basket Analysis using the Apriori algorithm across customer segments, uncovering high-affinity product pairs with remarkable lift multipliers to drive cross-selling and boost Average Order Value (AOV).
+    </p>
+</div>
+
+<!-- Association Rules Summary Cards -->
+<section class="metrics-grid" aria-label="Association Rule Metrics" style="margin-bottom: 2rem;">
+    <div class="metric-card accent-blue">
+        <div class="metric-content">
+            <span class="metric-title">Total Association Rules</span>
+            <span class="metric-value">761</span>
+            <span class="metric-subtext"><i class="fa-solid fa-check"></i> Discovered across segments</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-diagram-project"></i>
+        </div>
+    </div>
+
+    <div class="metric-card accent-teal">
+        <div class="metric-content">
+            <span class="metric-title">Regular Average Rules</span>
+            <span class="metric-value">356</span>
+            <span class="metric-subtext"><i class="fa-solid fa-arrow-up-right-dots"></i> Avg Lift: 14.82x | Max: 56.82x</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-users"></i>
+        </div>
+    </div>
+
+    <div class="metric-card accent-purple">
+        <div class="metric-content">
+            <span class="metric-title">New / Occasional Rules</span>
+            <span class="metric-value">230</span>
+            <span class="metric-subtext"><i class="fa-solid fa-arrow-up-right-dots"></i> Avg Lift: 17.81x | Max: 55.87x</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+    </div>
+
+    <div class="metric-card accent-emerald">
+        <div class="metric-content">
+            <span class="metric-title">At-Risk Rules</span>
+            <span class="metric-value">175</span>
+            <span class="metric-subtext"><i class="fa-solid fa-fire"></i> Highest Max Lift: 64.98x</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-bullseye"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Filter Controls Bar -->
+<section class="filter-bar" aria-label="Bundle Filtering">
+    <div class="filter-group">
+        <label for="segmentFilterSelect" class="filter-label">
+            <i class="fa-solid fa-filter" style="color: var(--primary); margin-right: 0.35rem;"></i>
+            Filter by Customer Segment:
+        </label>
+        <select id="segmentFilterSelect" class="custom-select" aria-label="Customer Segment Selector">
+            {% for s in segments %}
+            <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="bundleSearchInput" class="filter-label">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--slate-400); margin-right: 0.35rem;"></i>
+            Search Bundles:
+        </label>
+        <input type="text" id="bundleSearchInput" class="filter-search" placeholder="Type item name..." aria-label="Search items">
+    </div>
+</section>
+
+<!-- Top Bundles Chart (Lift Ranking) -->
+<section class="card" style="margin-bottom: 2rem;" id="bundle-chart-container">
+    <div class="chart-header">
+        <div>
+            <h3 class="chart-title">
+                <i class="fa-solid fa-ranking-star" style="color: var(--primary); margin-right: 0.4rem;"></i>
+                Top Bundle Rules by Lift Multiplier
+            </h3>
+            <span style="font-size: 0.85rem; color: var(--slate-500);">
+                Lift values indicate how many times more likely two items are purchased together compared to chance.
+            </span>
+        </div>
+        <span class="badge badge-champion">Cross-Sell Affinity</span>
+    </div>
+    <div class="chart-canvas-wrapper" style="height: 280px;">
+        <canvas id="bundleLiftChart"></canvas>
+    </div>
+</section>
+
+<!-- Bundle Recommendations Table -->
+<section style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h3 style="font-size: 1.35rem; color: var(--navy-dark); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-table" style="color: var(--primary);"></i>
+                Curated Bundle Recommendations
+            </h3>
+            <p style="color: var(--slate-500); font-size: 0.9rem;">
+                Sorted by statistical association strength and cross-sell reliability.
+            </p>
+        </div>
+        <span class="badge badge-secondary" id="rulesCountBadge">15 Recommendations Loaded</span>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table" id="bundlesTable">
+            <thead>
+                <tr>
+                    <th>Target Segment</th>
+                    <th>Recommended Bundle</th>
+                    <th>Antecedent (If bought)</th>
+                    <th>Consequent (Also buy)</th>
+                    <th>Confidence (%)</th>
+                    <th>Lift Score</th>
+                </tr>
+            </thead>
+            <tbody id="bundleTableBody">
+                <!-- Dynamically populated via script.js -->
+                {% for b in bundles %}
+                <tr>
+                    <td>
+                        <span class="badge {% if 'Regular' in b.Segment %}badge-blue{% elif 'New' in b.Segment or 'Occasional' in b.Segment %}badge-amber{% else %}badge-rose{% endif %}">
+                            {{ b.Segment }}
+                        </span>
+                    </td>
+                    <td style="font-weight: 600; color: var(--navy-dark);">{{ b['Bundle Products'] }}</td>
+                    <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #1e293b; font-size: 0.85rem;">{{ b.Antecedents }}</code></td>
+                    <td><code style="background: #eff6ff; padding: 2px 6px; border-radius: 4px; color: #2563eb; font-size: 0.85rem;">{{ b.Consequents }}</code></td>
+                    <td><span class="metric-pill">{{ "{:.1f}".format(b.Confidence * 100) }}%</span></td>
+                    <td><span class="badge badge-champion" style="font-size: 0.85rem;">{{ "{:.2f}".format(b.Lift) }}x</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Strategy Insights for Product Bundles -->
+<section class="info-boxes-grid">
+    <div class="info-box primary-lens">
+        <div class="info-box-header">
+            <div class="info-box-icon">
+                <i class="fa-solid fa-tags"></i>
+            </div>
+            <div>
+                <h4 class="info-box-title" style="font-size: 1.15rem;">Merchandising &amp; Bundle Packaging</h4>
+            </div>
+        </div>
+        <p style="font-size: 0.92rem; color: var(--navy-medium);">
+            For <strong>Regular Average Customers</strong>, bundles such as the <em>Poppy's Playhouse Bedroom &amp; Kitchen</em> and <em>Regency Sugar Bowl &amp; Milk Jug</em> boast extraordinary confidence (up to 82.8%) and lift (56.8x). Pre-packaging these items on the e-commerce store with an automatic 5% bundle saving will accelerate checkout velocity.
+        </p>
+    </div>
+
+    <div class="info-box secondary-lens">
+        <div class="info-box-header">
+            <div class="info-box-icon">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <div>
+                <h4 class="info-box-title" style="font-size: 1.15rem;">New Buyer Conversion Tactics</h4>
+            </div>
+        </div>
+        <p style="font-size: 0.92rem; color: var(--navy-medium);">
+            For <strong>New / Occasional Buyers</strong>, party and novelty decor combinations (e.g. <em>Pink &amp; Blue Happy Birthday Buntings</em> and <em>Childrens Cutlery Spaceboy &amp; Dolly Girl</em>) show strong dual-gender purchasing affinity. Promoting these sets on category landing pages increases initial cart diversity.
+        </p>
+    </div>
+</section>
+{% endblock %}

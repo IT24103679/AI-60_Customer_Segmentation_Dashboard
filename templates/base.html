@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-60 Customer Segmentation & Product Association Rule Mining Dashboard. SLIIT IT3091 Research Project.">
+    <title>{% block title %}AI-60 Customer Segmentation Dashboard{% endblock %}</title>
+    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Application Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="nav-brand" id="nav-brand-link">
+                <div class="nav-logo-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <span>DentAI &amp; Retail <span style="font-weight: 400; color: var(--slate-500);">AI-60</span></span>
+                <span class="brand-badge">IT3091</span>
+            </a>
+
+            <button class="nav-toggle-btn" aria-label="Toggle navigation menu" id="navToggleBtn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <nav>
+                <ul class="nav-menu" id="navMenu">
+                    <li>
+                        <a href="{{ url_for('home') }}" class="nav-link {% if active_page == 'home' %}active{% endif %}" id="nav-home">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('eda') }}" class="nav-link {% if active_page == 'eda' %}active{% endif %}" id="nav-eda">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            <span>EDA Insights</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('segments') }}" class="nav-link {% if active_page == 'segments' %}active{% endif %}" id="nav-segments">
+                            <i class="fa-solid fa-users-viewfinder"></i>
+                            <span>Customer Segments</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('bundles') }}" class="nav-link {% if active_page == 'bundles' %}active{% endif %}" id="nav-bundles">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                            <span>Product Bundles</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('models') }}" class="nav-link {% if active_page == 'models' %}active{% endif %}" id="nav-models">
+                            <i class="fa-solid fa-network-wired"></i>
+                            <span>Model Comparison</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content -->
+    <main class="main-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Standard Project Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="footer-text">© 2026 Group AI-60 | SLIIT | IT3091</p>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Model Comparison | AI-60 Customer Segmentation Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fa-solid fa-network-wired" style="color: var(--primary);"></i>
+        Clustering Model Evaluation &amp; Comparison
+    </h1>
+    <p class="page-subtitle">
+        Rigorous algorithmic benchmarking evaluating K-Means, Agglomerative Hierarchical, and DBSCAN clustering across mathematical separation indices and commercial interpretability.
+    </p>
+</div>
+
+<!-- Champion Model Spotlight Banner -->
+<section class="champion-card" id="champion-model-banner">
+    <div class="champion-info">
+        <div class="champion-eyebrow">
+            <i class="fa-solid fa-crown" style="color: #fbbf24;"></i>
+            <span>Selected Champion Architecture</span>
+        </div>
+        <h2 class="champion-title">K-Means Clustering ($k=4$)</h2>
+        <p class="champion-desc">
+            K-Means was selected as the optimal production segmentation model. It demonstrated superior boundary crispness, the highest Calinski-Harabasz variance score (3,701.14), the lowest Davies-Bouldin index (0.9155), and produced four distinct, actionable commercial customer personas.
+        </p>
+    </div>
+    <div class="champion-stats">
+        <div class="champion-stat-item">
+            <div class="champion-stat-val">0.4082</div>
+            <div class="champion-stat-lbl">Silhouette Score</div>
+        </div>
+        <div class="champion-stat-item">
+            <div class="champion-stat-val">0.9155</div>
+            <div class="champion-stat-lbl">Davies-Bouldin</div>
+        </div>
+        <div class="champion-stat-item">
+            <div class="champion-stat-val">3,701</div>
+            <div class="champion-stat-lbl">Calinski-Harabasz</div>
+        </div>
+    </div>
+</section>
+
+<!-- Silhouette Score Comparison Chart -->
+<section class="card" style="margin-bottom: 2.5rem;" id="chart-models-container">
+    <div class="chart-header">
+        <div>
+            <h3 class="chart-title">
+                <i class="fa-solid fa-chart-simple" style="color: var(--primary); margin-right: 0.4rem;"></i>
+                Silhouette Score Comparison Across Algorithms
+            </h3>
+            <span style="font-size: 0.85rem; color: var(--slate-500);">
+                Scores range from -1 to +1; higher positive values reflect stronger intra-cluster cohesion and inter-cluster separation.
+            </span>
+        </div>
+        <span class="badge badge-blue">Benchmark Metric</span>
+    </div>
+    <div class="chart-canvas-wrapper" style="height: 300px;">
+        <canvas id="modelComparisonChart"></canvas>
+    </div>
+</section>
+
+<!-- Model Comparison Table -->
+<section style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h3 style="font-size: 1.35rem; color: var(--navy-dark); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-table-columns" style="color: var(--primary);"></i>
+                Comprehensive Model Comparison Matrix
+            </h3>
+            <p style="color: var(--slate-500); font-size: 0.9rem;">
+                Quantitative metrics computed on standardized RFM features.
+            </p>
+        </div>
+        <span class="badge badge-secondary">3 Algorithms Benchmarked</span>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table" id="modelsComparisonTable">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Optimal Clusters ($k$)</th>
+                    <th>Silhouette Score<br><small style="color: var(--slate-400); font-weight: normal;">(Higher = Better)</small></th>
+                    <th>Davies-Bouldin Index<br><small style="color: var(--slate-400); font-weight: normal;">(Lower = Better)</small></th>
+                    <th>Calinski-Harabasz<br><small style="color: var(--slate-400); font-weight: normal;">(Higher = Better)</small></th>
+                    <th>Evaluation Status</th>
+                    <th>Diagnostic Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in model_data %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--navy-dark); font-size: 0.98rem;">{{ m.model }}</strong>
+                    </td>
+                    <td><span class="metric-pill">{{ m.clusters }}</span></td>
+                    <td>
+                        <strong style="color: {% if m.silhouette > 0.4 %}#2563eb{% elif m.silhouette > 0 %}#059669{% else %}#ef4444{% endif %};">
+                            {{ "{:.4f}".format(m.silhouette) }}
+                        </strong>
+                    </td>
+                    <td>
+                        {% if m.davies_bouldin != 'N/A' %}
+                        <span class="metric-pill">{{ "{:.4f}".format(m.davies_bouldin) }}</span>
+                        {% else %}
+                        <span style="color: var(--slate-400);">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if m.calinski_harabasz != 'N/A' %}
+                        <strong style="color: var(--navy-dark);">{{ "{:,.2f}".format(m.calinski_harabasz) }}</strong>
+                        {% else %}
+                        <span style="color: var(--slate-400);">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {{ m.badge_class }}">{{ m.status }}</span>
+                    </td>
+                    <td style="max-width: 320px; font-size: 0.88rem; color: var(--slate-500);">
+                        {{ m.notes }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Visual Exhibits: Optimal Clusters & Model Comparison Plots -->
+<section style="margin-top: 2rem;">
+    <h3 style="font-size: 1.35rem; color: var(--navy-dark); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-chart-area" style="color: var(--primary);"></i>
+        Clustering Diagnostics &amp; Validation Visuals
+    </h3>
+    <p style="color: var(--slate-500); font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Experimental plots depicting the determination of $k$ and multi-algorithm partitioning patterns.
+    </p>
+
+    <div class="exhibits-grid">
+        <!-- Exhibit 1: Optimal Clusters Analysis -->
+        <div class="exhibit-card" id="exhibit-optimal-k">
+            <div class="exhibit-header">
+                <h4 class="exhibit-title">Optimal Cluster Determination ($k=2\dots 10$)</h4>
+                <span class="exhibit-subtitle">Elbow Method (Inertia Curve) and Silhouette Score Progression</span>
+            </div>
+            <div class="exhibit-image-wrapper">
+                <img src="{{ url_for('static', filename='images/optimal_clusters_analysis.png') }}" 
+                     alt="Optimal Clusters Analysis Elbow and Silhouette" 
+                     loading="lazy"
+                     id="img-optimal-k">
+            </div>
+            <div class="exhibit-footer">
+                <p>
+                    <strong>Key Takeaway:</strong> While $k=3$ produced the highest mathematical peak (0.4552), $k=4$ maintained a strong silhouette (0.4082) with an inflection point on the elbow curve, providing superior granularity by splitting steady average spenders from top VIP contributors.
+                </p>
+            </div>
+        </div>
+
+        <!-- Exhibit 2: Model Comparison Visual -->
+        <div class="exhibit-card" id="exhibit-models-comp">
+            <div class="exhibit-header">
+                <h4 class="exhibit-title">Model Metric Comparison Plot</h4>
+                <span class="exhibit-subtitle">Visual distribution comparison across clustering architectures</span>
+            </div>
+            <div class="exhibit-image-wrapper">
+                <img src="{{ url_for('static', filename='images/model_comparison.png') }}" 
+                     alt="Model Comparison Visual Benchmark" 
+                     loading="lazy"
+                     id="img-models-comp">
+            </div>
+            <div class="exhibit-footer">
+                <p>
+                    <strong>Key Takeaway:</strong> Agglomerative Hierarchical clustering yields comparable cluster groupings to K-Means, confirming cluster stability, but K-Means exhibits tighter variance boundaries and substantially faster execution efficiency.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

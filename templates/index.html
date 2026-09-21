@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Home | AI-60 Customer Segmentation Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fa-solid fa-chart-line" style="color: var(--primary);"></i>
+        Customer Intelligence &amp; Segmentation Dashboard
+    </h1>
+    <p class="page-subtitle">
+        AI-60 Machine Learning framework integrating RFM Behavioral Clustering with Market Basket Association Rules to unlock actionable retail analytics and data-driven personalization.
+    </p>
+</div>
+
+<!-- 4 Key Metric Cards -->
+<section class="metrics-grid" aria-label="Key Performance Indicators">
+    <!-- Metric 1: Total Transactions -->
+    <div class="metric-card accent-blue" id="metric-transactions">
+        <div class="metric-content">
+            <span class="metric-title">Total Transactions</span>
+            <span class="metric-value">{{ metrics.total_transactions }}</span>
+            <span class="metric-subtext"><i class="fa-solid fa-cart-shopping"></i> Raw records analyzed</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-receipt"></i>
+        </div>
+    </div>
+
+    <!-- Metric 2: Unique Customers -->
+    <div class="metric-card accent-teal" id="metric-customers">
+        <div class="metric-content">
+            <span class="metric-title">Unique Customers</span>
+            <span class="metric-value">{{ metrics.unique_customers }}</span>
+            <span class="metric-subtext"><i class="fa-solid fa-user-tag"></i> 3,614 segmented cohort</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-users"></i>
+        </div>
+    </div>
+
+    <!-- Metric 3: Customer Segments -->
+    <div class="metric-card accent-purple" id="metric-segments">
+        <div class="metric-content">
+            <span class="metric-title">Customer Segments</span>
+            <span class="metric-value">{{ metrics.num_segments }}</span>
+            <span class="metric-subtext"><i class="fa-solid fa-cubes"></i> K-Means (k=4) Clusters</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-circle-nodes"></i>
+        </div>
+    </div>
+
+    <!-- Metric 4: Bundle Rules -->
+    <div class="metric-card accent-emerald" id="metric-rules">
+        <div class="metric-content">
+            <span class="metric-title">Association Rules</span>
+            <span class="metric-value">{{ metrics.total_rules }}</span>
+            <span class="metric-subtext"><i class="fa-solid fa-bolt"></i> {{ metrics.top_bundles }} top bundles extracted</span>
+        </div>
+        <div class="metric-icon-wrap">
+            <i class="fa-solid fa-basket-shopping"></i>
+        </div>
+    </div>
+</section>
+
+<!-- 2 Info Boxes: Primary Lens & Secondary Lens -->
+<section class="info-boxes-grid" aria-label="Analytical Perspectives">
+    <!-- Info Box 1: Primary Lens -->
+    <div class="info-box primary-lens" id="primary-lens-box">
+        <div class="info-box-header">
+            <div class="info-box-icon">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <div>
+                <h2 class="info-box-title">Primary Lens: Customer Segmentation</h2>
+            </div>
+            <span class="info-box-badge">Unsupervised Learning</span>
+        </div>
+        <p>
+            The customer-centric foundation leverages <strong>RFM (Recency, Frequency, Monetary)</strong> metrics to classify each unique shopper into distinct behavioral archetypes based on purchasing frequency, order magnitude, and dormancy.
+        </p>
+        <ul class="info-box-list">
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>RFM Feature Engineering:</strong> Derived transactional recency in days, total order cadence, and total customer gross spend.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>Multi-Model Benchmarking:</strong> Comparative evaluation across K-Means, Agglomerative Hierarchical, and DBSCAN algorithms.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>Actionable Personas:</strong> Delineates Regular Average Shoppers, High-Value VIPs, First-time Exploratory Buyers, and Dormant At-Risk Accounts.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>Strategic Objective:</strong> Minimize churn, protect core cash-flow accounts, and optimize lifecycle communication cadences.</span>
+            </li>
+        </ul>
+        <div style="margin-top: 1.5rem;">
+            <a href="{{ url_for('segments') }}" class="badge badge-blue" style="font-size: 0.88rem; padding: 0.5rem 1rem;">
+                Explore Segments <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Info Box 2: Secondary Lens -->
+    <div class="info-box secondary-lens" id="secondary-lens-box">
+        <div class="info-box-header">
+            <div class="info-box-icon">
+                <i class="fa-solid fa-diagram-project"></i>
+            </div>
+            <div>
+                <h2 class="info-box-title">Secondary Lens: Product Association</h2>
+            </div>
+            <span class="info-box-badge" style="color: #059669; background: #d1fae5;">Market Basket Analysis</span>
+        </div>
+        <p>
+            The item-level perspective uncovers hidden co-occurrence patterns across shopping baskets through <strong>Apriori Association Rule Mining</strong>, generating high-lift product bundles tailored to each customer cluster.
+        </p>
+        <ul class="info-box-list">
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>Market Basket Mining:</strong> Evaluates transactional co-occurrences utilizing Support, Confidence, and Lift metrics.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>Segment-Specific Affinity:</strong> Discovers which item pairs appeal strongest to distinct customer purchasing tiers.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>High Lift Multipliers:</strong> Top recommendation bundles exhibit association lifts exceeding <strong>55x to 64x</strong> over random chance.</span>
+            </li>
+            <li>
+                <i class="fa-solid fa-circle-check"></i>
+                <span><strong>Strategic Objective:</strong> Elevate Average Order Value (AOV), design complementary package promotions, and increase item attach rates.</span>
+            </li>
+        </ul>
+        <div style="margin-top: 1.5rem;">
+            <a href="{{ url_for('bundles') }}" class="badge badge-emerald" style="font-size: 0.88rem; padding: 0.5rem 1rem;">
+                View Product Bundles <i class="fa-solid fa-arrow-right" style="margin-left: 0.35rem;"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Navigation Cards -->
+<section style="margin-top: 1rem;">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--navy-dark);">
+        <i class="fa-solid fa-compass" style="color: var(--primary); margin-right: 0.4rem;"></i>
+        Quick Navigation &amp; Workflow Sections
+    </h3>
+    <div class="metrics-grid">
+        <a href="{{ url_for('eda') }}" class="card" style="display: block; text-decoration: none;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <div style="background: #e0f2fe; color: #0284c7; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <h4 style="font-size: 1.05rem; color: var(--navy-dark);">1. Exploratory Data Analysis</h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--slate-500);">Review data cleaning hurdles, missing ID rates, transaction seasonality, and RFM scaling.</p>
+        </a>
+
+        <a href="{{ url_for('segments') }}" class="card" style="display: block; text-decoration: none;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <div style="background: #eff6ff; color: #2563eb; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                </div>
+                <h4 style="font-size: 1.05rem; color: var(--navy-dark);">2. Customer Segments</h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--slate-500);">Inspect cluster demographics, Recency/Frequency/Monetary stats, and marketing strategies.</p>
+        </a>
+
+        <a href="{{ url_for('bundles') }}" class="card" style="display: block; text-decoration: none;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <div style="background: #f0fdf4; color: #059669; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+                <h4 style="font-size: 1.05rem; color: var(--navy-dark);">3. Bundle Recommendations</h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--slate-500);">Filter high-affinity item bundles by customer segment with support, confidence, and lift data.</p>
+        </a>
+
+        <a href="{{ url_for('models') }}" class="card" style="display: block; text-decoration: none;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <div style="background: #fdf4ff; color: #c026d3; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h4 style="font-size: 1.05rem; color: var(--navy-dark);">4. Model Evaluation</h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--slate-500);">Compare K-Means vs Hierarchical vs DBSCAN across Silhouette, Davies-Bouldin, and Calinski scores.</p>
+        </a>
+    </div>
+</section>
+{% endblock %}
